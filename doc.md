@@ -1,8 +1,8 @@
-# Quick introduction to the Rust programming language.
+# Quick introduction to the Rust programming language
 
 This document is meant to be a jump start for people that are not familiar with the Rust programming language. It covers the basic syntax and features of Rust and provides comparison with C++. After learning the basic syntax you should be able to read most Rust code and at least get an intuitive understanding of the program logic, even if not everything is clear. Hopefuly then you can decide if you are interested in the language.
 
-### Other sources
+### Other materials
 
 Documentation:
 - <https://doc.rust-lang.org/std> - Rust standard library docs
@@ -17,9 +17,8 @@ Blogs and other:
 - <https://github.com/nrc/r4cppp> - Rust tutorial aimed at C++ programmers
 - <https://fasterthanli.me/articles/a-half-hour-to-learn-rust> - Another 30 minutes tutorial
 
----
 
-# TOC
+## TOC
 
 - [Types](#types)
 - [Syntax](#syntax)
@@ -29,9 +28,8 @@ Blogs and other:
 - [Lifetimes](#lifetimes)
 - [Borrow rules](#borrow-rules)
 
----
 
-# Types
+## Types
 
 ### Fundamental types
 
@@ -42,24 +40,19 @@ Blogs and other:
 | `ssize_t`, `size_t`               | `isize`, `usize`  |                                                    |
 | `float`, `double`                 | `f32`, `f64`      |                                                    |
 | `char32_t`                        | `char`            | Unicode code point                                 |
+| `char`                            | `u8`              | byte                                               |
 | `const char*`, `std::string_view` | `&str`            | string slice - ptr + len                           |
 | `std::string`                     | `String`          |                                                    |
 | `std::span` (c++20)               | `&[T]`, `&mut[T]` | array slice - ptr + len                            |
 | `T[N]`, `std::array<T, N>`        | `[T; N]`          |                                                    |
 | `std::vector<T>`                  | `Vec<T>`          |                                                    |
-| `std::tuple<A, B, C>`             | `(A, B, C)`       | field access with `.0`, `.1`, ... or destructoring |
+| `std::tuple<A, B, C>`             | `(A, B, C)`       | field access with `.0`, `.1`, ... or destructuring |
 | `*const T`, `const T&`            | `&T`              | non-null and always valid                          |
 | `*T`, `T&`                        | `&mut T`          | non-null and always valid                          |
 
 * the type `()` (called "unit") is usually used similarily to `void` in C++ - as the return type of functions that don't return anything. However there is a small difference:
     * `void` in C++ is not a type, it is a special syntax to denote "lack of value".
     * `()` is Rust is a proper type with a single possible value - `()`. It is a zero-sized type. As it is an ordinary type you can assign it to a variable, or, more importantly, use it as a type parameter in a generic function or struct
-* Rust strings (`&str`, `String`) are always valid utf8 and are not null terminated.
-  If you need to work with a string that may not be utf8 you should use byte arrays instead (`&[u8]`, `Vec<u8>`).
-    * `"..."` - string literal, type: `&str`.
-    * `'x'` - character literal, type: `char`
-    * `b"..."` - ASCII byte string literal, type: `&[u8]`
-    * `b'x'` - ASCII byte literal, type: `u8`
 
 ### Common containers
 
@@ -85,9 +78,8 @@ Blogs and other:
 * Rust doesn't allow both sharing and mutating a value (see [borrow rules](#borrow-rules)).
 * Because `Rc` and `Arc` allow shearing, they disallow mutation - unless we can prove we are the only ones currently accessing the value (again see [borrow rules](#borrow-rules)).
 
----
 
-# Syntax
+## Syntax
 
 ### Variables
 
@@ -123,7 +115,8 @@ let x = 10_234_567;     // '_' can be used as separator in numbers
 let y = 10_234_567_u64; // explicit integer type with `u64` suffix
 
 let arr = [1, 2, 3, 4];     // fixed array `[i32; 4]`
-let slice = &[1, 2, 3, 4];  // reference to array `&[i32; 4]`, which will be automatically cast to array slice `&[i32]` if needed
+let slice = &[1, 2, 3, 4];  // reference to array `&[i32; 4]`
+                            // will implicitly cast to array slice `&[i32]` if needed
 let vec = vec![1, 2, 3, 4]; // vector `Vec<i32>`; `vec!` is a macro
 
 let arr = ['a'; 4];     // `[char; 4]` - array of 4 elements each with the value 'a'
@@ -135,6 +128,19 @@ let ivan = Person { name: String::from("Ivan"), email: String::from("ivan@abv.bg
     let email = String::from("ivan@abv.bg");
     let ivan = Persion { name, email }; // shorthand if field name mathes variable name
 }
+```
+
+### Strings
+
+```rust
+// Rust strings (`&str`, `String`) are always valid utf8 and are not null terminated.
+// If you need to work with a string that may not be utf8 you should use byte arrays
+// instead (`&[u8]`, `Vec<u8>`).
+
+let s1: &str  = "...";  // string literal
+let c1: char  = 'x';    // character literal
+let s2: &[u8] = b"..."; // ASCII byte string literal
+let c2: u8    = b'x';   // ASCII byte literal
 ```
 
 ### Control flow
@@ -213,9 +219,8 @@ let size = std::mem::size_of::<i32>();
 let vec = [1, 2, 3].iter().collect::<Vec<_>>();
 ```
 
----
 
-# Data types
+## Data types
 
 ### Structs
 
@@ -341,9 +346,8 @@ fn print_val(val: &dyn std::fmt::Debug) {
 }
 ```
 
----
 
-# Iteration
+## Iteration
 
 Iterators in Rust are a struct implementing the trait `Iterator`. They have a method `next(&mut self) -> Option<T>` which returns the next element (or `None`) and advances the internal state of the iterator. Thus they can be used only for a single forward pass. This is very different from C++, where iterators are more like a pointer or a possition inside a container.
 
@@ -373,9 +377,8 @@ for (index, elem) in collection.iter()
 }
 ```
 
----
 
-# Error handling
+## Error handling
 
 There are no exceptions. Instead errors are encoded in the return value of the function via the `Option` or `Result` types.
 
@@ -438,9 +441,8 @@ fn something() -> Option<MyVal> {
 
 Panicing is used for situations which are programmer mistakes and should have never happened and it doesn't make sense to try and recover from them. Usually it is done with the `panic!` or `assert!` macros or by the methods `Option::unwrap()` or `Result::unwrap()`. Panics either kill the program or are handled on very coarse boundaries.
 
----
 
-# Lifetimes
+## Lifetimes
 
 References must always be valid and this is enforced at compile time. To do that the compiler tracks object lifetimes. Usually that is invisible, but in some cases special lifetime annotations (like the `'a` in `&'a i32`) must be added.
 
@@ -464,9 +466,8 @@ pub struct SliceIter<'a, T> {
 
 *When reading code you can mostly ignore lifetimes.*
 
----
 
-# Borrow rules
+## Borrow rules
 
 - `&T` is a const reference, also called a shared reference
   - multiple const references to a given value may exists at the same time
