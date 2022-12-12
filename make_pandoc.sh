@@ -8,4 +8,4 @@ pandoc --from=markdown+hard_line_breaks \
     --metadata title="Rust Cheatsheet 🦀" \
     -c pandoc.css \
     -o rust-cheatsheet.html \
-    doc.md
+    README.md
